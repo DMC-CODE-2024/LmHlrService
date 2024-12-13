@@ -1,5 +1,7 @@
 package com.gl.eirs.hlrfulldump.connection;
 
+import org.jasypt.util.text.BasicTextEncryptor;
+
 import com.gl.eirs.hlrfulldump.configuration.AppConfig;
 //import com.gl.eirs.hlrfulldump.configuration.CommonConfiguration;
 //import com.gl.eirs.hlrfulldump.configuration.ProcessConfiguration;
