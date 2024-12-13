@@ -42,7 +42,7 @@ public class MySQLConnection {
 //            final String PASS = getPassword(passwordDecryptor);
 //            logger.error(appConfig.getSpringDatasourcePassword());
 //            String PASS = getPassword(passwordDecryptor);
-            String PASS = appConfig.getSpringDatasourcePassword();
+            String PASS = decryptor(appConfig.getSpringDatasourcePassword());
 //            logger.error(PASS);
             logger.info("Connection  Init " + java.time.LocalDateTime.now());
             Class.forName(JDBC_DRIVER);
@@ -61,6 +61,13 @@ public class MySQLConnection {
             return null;
         }
     }
+
+public static String decryptor(String encryptedText) {
+        BasicTextEncryptor encryptor = new BasicTextEncryptor();
+        encryptor.setPassword(System.getenv("JASYPT_ENCRYPTOR_PASSWORD"));
+        return encryptor.decrypt(encryptedText);
+    }
+
 //    String getPassword(final String passwordDecryptor) {
 //        String passwordDecryptorNew =passwordDecryptor.replace("${APP_HOME}", System.getenv("APP_HOME"));
 //        logger.info("Decrypting Password");
