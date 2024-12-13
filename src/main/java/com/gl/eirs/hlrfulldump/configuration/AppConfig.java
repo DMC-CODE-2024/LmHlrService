@@ -42,7 +42,7 @@ public class AppConfig {
     @Value("${spring.datasource.driver-class-name}")
     String jdbcDriver;
 
-    @Value("${spring.datasource.password}")
+    @Value("${dbEncyptPassword}")
     String springDatasourcePassword;
 
     @Value("${spring.datasource.username}")
