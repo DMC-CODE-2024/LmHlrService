@@ -121,8 +121,8 @@ public class DeltaFileProcessDel2 {
                             logger.info("Total entries processed for delete {}", line);
                             for (int k = 0; k < delInDev.length; k++) {
                                 if (delInDev[k] == 0) {
-                                    logger.error("Delete statement to delete a record in active_msisdn_table table failed.");
-                                    logger.error("The record is " + deleteQueries.get(k));
+                                    logger.info("Delete statement to delete a record in active_msisdn_table table failed.");
+                                    logger.info("The record is " + deleteQueries.get(k));
                                     failureCount++;
                                 } else {
                                     delFileCount++;

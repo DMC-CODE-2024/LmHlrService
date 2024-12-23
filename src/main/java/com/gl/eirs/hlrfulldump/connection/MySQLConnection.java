@@ -3,6 +3,7 @@ package com.gl.eirs.hlrfulldump.connection;
 import com.gl.eirs.hlrfulldump.configuration.AppConfig;
 //import com.gl.eirs.hlrfulldump.configuration.CommonConfiguration;
 //import com.gl.eirs.hlrfulldump.configuration.ProcessConfiguration;
+import org.jasypt.util.text.BasicTextEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,11 +43,11 @@ public class MySQLConnection {
 //            final String PASS = getPassword(passwordDecryptor);
 //            logger.error(appConfig.getSpringDatasourcePassword());
 //            String PASS = getPassword(passwordDecryptor);
-            String PASS = appConfig.getSpringDatasourcePassword();
+            String PASS =    appConfig.getSpringDatasourcePassword();
 //            logger.error(PASS);
             logger.info("Connection  Init " + java.time.LocalDateTime.now());
             Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            conn = DriverManager.getConnection(DB_URL, USER, decryptor(PASS));
             logger.info("Connection created successfully " + conn + " .. " + java.time.LocalDateTime.now());
             return conn;
         } catch (Exception e) {
@@ -60,6 +61,12 @@ public class MySQLConnection {
             System.exit(100);
             return null;
         }
+    }
+
+    public static String decryptor(String encryptedText) {
+        BasicTextEncryptor encryptor = new BasicTextEncryptor();
+        encryptor.setPassword(System.getenv("JASYPT_ENCRYPTOR_PASSWORD"));
+        return encryptor.decrypt(encryptedText);
     }
 //    String getPassword(final String passwordDecryptor) {
 //        String passwordDecryptorNew =passwordDecryptor.replace("${APP_HOME}", System.getenv("APP_HOME"));

@@ -12,16 +12,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-
-@EnableEncryptableProperties
+//@EnableEncryptableProperties
 @SpringBootApplication
 //@ComponentScan("com.gl.eirs.hlrfulldump")
 public class HlrFullDumpApplication implements CommandLineRunner {
     @Autowired
     HlrDumpProcessorMain hlrDumpProcessorMain;
 
-    @Autowired
-    MySQLConnection connection;
+//    @Autowired
+//    MySQLConnection connection;
 
     @Autowired
     AppConfig appConfig;

@@ -62,8 +62,7 @@ public class HlrDumpProcessorMain {
     private static String featureName = "HLR_Full_Dump_Processor";
 
     public void startFunction(int intParam, String addFileName, String delFileName) throws Exception {
-        String deltaFilePath = appConfig.getDeltaFilePath();
-        String operator = appConfig.getOperator();
+       String operator = appConfig.getOperator();
 
         if (intParam == 1) {
             // Process files based on the provided file names
@@ -74,20 +73,16 @@ public class HlrDumpProcessorMain {
             // Use default file names or logic
             logger.info("Processing files using default logic or file names.");
         } else {
-            logger.error("Invalid value for intParam. Please provide 0 or 1.");
+            logger.info("Invalid value for intParam. Please provide 0 or 1.");
             return;
         }
 
-        logger.error(operator);
-        Connection conn = null;
         moduleName = moduleName + "_" + operator;
-
-
-        try {
+        try ( Connection conn = connection.getConnection();)  {
             final Date date = new Date();
             final long executionStartTime = date.getTime();
             logger.info("Java process execution Start Time = " + executionStartTime);
-            conn = connection.getConnection();
+
             // creating an entry in audit table.
             logger.info("Making an entry in audit table indicate start of HLR Dump Process.");
             auditManagement.createAudit(201, 0, featureName, conn, moduleName);
@@ -126,7 +121,8 @@ public class HlrDumpProcessorMain {
             if(!addFileStatus) {
                 alertManagement.raiseAnAlert("alert5202", operator, "", 0);
                 auditManagement.updateAudit(501, "FAIL", featureName, moduleName, delFileDto.getTotalRecords() + addFileDto.getTotalRecords(),"",
-                    executionFinalTime, delFileDto.getSuccessRecords() + addFileDto.getSuccessRecords(), delFileDto.getFailedRecords() + addFileDto.getFailedRecords(), "The diff file processing failed for file " + addFileName, conn);
+                    executionFinalTime, delFileDto.getSuccessRecords() + addFileDto.getSuccessRecords(), delFileDto.getFailedRecords() + addFileDto.getFailedRecords(), "The diff file processing failed for file " + addFileName,connection.getConnection());
+                connection.getConnection().close();
                 System.exit(1);
             }
 
@@ -153,7 +149,8 @@ public class HlrDumpProcessorMain {
             logger.error(String.valueOf(exception));
             alertManagement.raiseAnAlert("alert5202", exception.getMessage(), operator, 0);
             auditManagement.updateAudit(501, "FAIL", featureName, moduleName, 0, "",
-                    executionFinalTime, 0, 0, "The process exited with exception" + exception.getMessage() + " for operator" + operator + ".", conn);
+                    executionFinalTime, 0, 0, "The process exited with exception" + exception.getMessage() + " for operator" + operator + ".", connection.getConnection());
+           connection.getConnection().close();
             System.exit(1);
         }
     }

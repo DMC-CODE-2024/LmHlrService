@@ -43,15 +43,6 @@ public class AuditDao {
 
     public void updateInAuditTable(int statusCode, String status, String errorMessage,
                                    long numberOfRecord, String info, String moduleName, String featureName, Connection conn , long executionFinishTime, long updatedCount, long failureCount) throws ClassNotFoundException {
-
-        String serverName=null;
-        try {
-            serverName
-                    = InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
-            logger.error("Exception in finding hostname " + e);
-        }
         int count = 0;
         String query = "update  aud.modules_audit_trail set status_code='"+statusCode+"',status='"+status+"',error_message='"+errorMessage+"',info='"+info+"',count='"+numberOfRecord+"',execution_time='"+executionFinishTime+"',count2='"+updatedCount+"' , failure_count='"+failureCount+"' ,modified_on=CURRENT_TIMESTAMP where module_name='"+moduleName+"' and feature_name='"+featureName+"' order by id desc limit 1";
         logger.info("Update statement to update a record in audit table = " + query);
