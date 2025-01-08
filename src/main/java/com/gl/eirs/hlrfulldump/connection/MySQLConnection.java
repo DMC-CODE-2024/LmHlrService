@@ -32,19 +32,11 @@ public class MySQLConnection {
 //            final String JDBC_DRIVER = CommonConfiguration.getProperty("jdbc_driver").trim();
             String JDBC_DRIVER = appConfig.getJdbcDriver();
 
-//            final String DB_URL = CommonConfiguration.getProperty("db_url").trim();
             String DB_URL = appConfig.getDbUrl();
 
-//            final String USER = CommonConfiguration.getProperty("dbUsername");
             String USER = appConfig.getDbUsername();
-//            final String passwordDecryptor = ProcessConfiguration.getProperty("password_decryptor").trim();
-//            String passwordDecryptor = appConfig.getPasswordDecryptor();
 
-//            final String PASS = getPassword(passwordDecryptor);
-//            logger.error(appConfig.getSpringDatasourcePassword());
-//            String PASS = getPassword(passwordDecryptor);
             String PASS =    appConfig.getSpringDatasourcePassword();
-//            logger.error(PASS);
             logger.info("Connection  Init " + java.time.LocalDateTime.now());
             Class.forName(JDBC_DRIVER);
             conn = DriverManager.getConnection(DB_URL, USER, decryptor(PASS));
@@ -68,6 +60,7 @@ public class MySQLConnection {
         encryptor.setPassword(System.getenv("JASYPT_ENCRYPTOR_PASSWORD"));
         return encryptor.decrypt(encryptedText);
     }
+    
 //    String getPassword(final String passwordDecryptor) {
 //        String passwordDecryptorNew =passwordDecryptor.replace("${APP_HOME}", System.getenv("APP_HOME"));
 //        logger.info("Decrypting Password");
