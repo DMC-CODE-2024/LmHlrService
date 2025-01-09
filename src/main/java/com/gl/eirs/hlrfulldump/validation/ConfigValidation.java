@@ -26,8 +26,6 @@ public class ConfigValidation {
 //    final private static String batchCount = ProcessConfiguration.getProperty("batchCount");
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-//    private static final String operator = ProcessConfiguration.getProperty("operator");
-
     private static String moduleName = "HLR_Full_Dump";
     private static String featureName = "HLR_Full_Dump_Processor";
     private static long executionFinishTime;
@@ -66,7 +64,6 @@ public class ConfigValidation {
         moduleName = moduleName+"_"+operator;
         final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 //        hlrErrorFilePath =hlrErrorFilePath.replace("${DATA_HOME}", System.getenv("DATA_HOME"));
-
 //        if(!isDirectoryValidation(hlrErrorFilePath)) {
 //            logger.error("The config value for hlrErrorFilePath is not correct.");
 //            this.dateFinish = new Date();
