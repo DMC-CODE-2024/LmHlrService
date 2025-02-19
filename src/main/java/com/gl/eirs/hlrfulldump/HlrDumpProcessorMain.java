@@ -51,13 +51,10 @@ public class HlrDumpProcessorMain {
     @Autowired
     AppConfig appConfig;
 
-    @Autowired
-    FileDto fileDto;
-
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private static long executionFinishTime;
     private static long executionFinalTime;
-
+    public static int generatedKey;
     private static String moduleName = "HLR_Full_Dump";
     private static String featureName = "HLR_Full_Dump_Processor";
 

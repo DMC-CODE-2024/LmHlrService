@@ -5,13 +5,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
+import com.gl.eirs.hlrfulldump.HlrDumpProcessorMain;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.sql.*;
 
 @Component
 public class AuditDao {
+
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -31,20 +32,31 @@ public class AuditDao {
                 + "values('" + statusCode + "','" + status + "','" + errorMessage + "','" + feature  + "','"+serverName+"','"+executionFinishTime+"','"+moduleName+"')";
         logger.info("Insert statement to create a record in audit table = " + query);
 
-            try (Statement stmt = connection.createStatement();) {
-                int result=stmt.executeUpdate(query);
-                logger.info("Query execution result in audit table = "+ result);
-            } catch (SQLException exception) {
-                count++;
-                logger.error("Retry count is --" + count);
-                logger.error("Insert in audit table failed with = " + exception);
+//            try (Statement stmt = connection.createStatement();) {
+//                int result=stmt.executeUpdate(query);
+//                logger.info("Query execution result in audit table = "+ result);
+//            } catch (SQLException exception) {
+//                count++;
+//                logger.error("Retry count is --" + count);
+//                logger.error("Insert in audit table failed with = " + exception);
+//            }
+
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
+            var rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                HlrDumpProcessorMain.generatedKey = rs.getInt(1);
             }
+            logger.info("Id for modules audit  = " + HlrDumpProcessorMain.generatedKey );
+        } catch (Exception e) {
+            logger.error("Unable to insert module audit: " + e.getLocalizedMessage());
+        }
     }
 
     public void updateInAuditTable(int statusCode, String status, String errorMessage,
                                    long numberOfRecord, String info, String moduleName, String featureName, Connection conn , long executionFinishTime, long updatedCount, long failureCount) throws ClassNotFoundException {
         int count = 0;
-        String query = "update  aud.modules_audit_trail set status_code='"+statusCode+"',status='"+status+"',error_message='"+errorMessage+"',info='"+info+"',count='"+numberOfRecord+"',execution_time='"+executionFinishTime+"',count2='"+updatedCount+"' , failure_count='"+failureCount+"' ,modified_on=CURRENT_TIMESTAMP where module_name='"+moduleName+"' and feature_name='"+featureName+"' order by id desc limit 1";
+        String query = "update  aud.modules_audit_trail set status_code='"+statusCode+"',status='"+status+"',error_message='"+errorMessage+"',info='"+info+"',count='"+numberOfRecord+"',execution_time='"+executionFinishTime+"',count2='"+updatedCount+"' , failure_count='"+failureCount+"' ,modified_on=CURRENT_TIMESTAMP where module_name='"+moduleName+"' and feature_name='"+featureName+"' and id =  "+HlrDumpProcessorMain.generatedKey;
         logger.info("Update statement to update a record in audit table = " + query);
 
         try (Statement stmt = conn.createStatement();) {
