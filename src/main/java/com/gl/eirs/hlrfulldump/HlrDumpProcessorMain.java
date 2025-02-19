@@ -121,32 +121,26 @@ public class HlrDumpProcessorMain {
             if(!addFileStatus) {
                 alertManagement.raiseAnAlert("alert5202", operator, "", 0);
                 auditManagement.updateAudit(501, "FAIL", featureName, moduleName, delFileDto.getTotalRecords() + addFileDto.getTotalRecords(),"",
-                    executionFinalTime, delFileDto.getSuccessRecords() + addFileDto.getSuccessRecords(), delFileDto.getFailedRecords() + addFileDto.getFailedRecords(), "The diff file processing failed for file " + addFileName,connection.getConnection());
+                    executionFinalTime, delFileDto.getSuccessRecords() + addFileDto.getSuccessRecords(), delFileDto.getFailedRecords() + addFileDto.getFailedRecords(), "The diff file processing failed for file " + addFileName,conn);
                 connection.getConnection().close();
                 System.exit(1);
             }
-
-
-
 //            File addHlrDeltaFile = new File(deltaFilePath + addFileName);
 //            File delHlrDeltaFile = new File(deltaFilePath + delFileName);
 //
 //            Path addFile = Paths.get(addHlrDeltaFile.toURI());
 //            Path delFile = Paths.get(delHlrDeltaFile.toURI());
 //            long insertCount = Files.lines(addFile).count();
-//            long deletedCount = Files.lines(delFile).count();
-
-
+//            long deletedCount = Files.lines(delFile).count()
 //            long failureCount = 0;
             auditManagement.updateAudit(200, addFileDto.getTotalRecords() + delFileDto.getTotalRecords(), "", executionFinalTime, addFileDto.getSuccessRecords()+delFileDto.getSuccessRecords(), addFileDto.getFailedRecords() + delFileDto.getFailedRecords(), "NA", moduleName, featureName, "SUCCESS", conn);
             logger.info("File Processing is successfully completed.");
-
             // Call the method to fill missing IMSI and MSISDN
             logger.info("Calling fillMissingImsiMsisdn method.");
             fillMissingImsiMsisdn(conn);
             logger.info("fillMissingImsiMsisdn method completed successfully.");
         } catch (Exception exception) {
-            logger.error(String.valueOf(exception));
+            logger.error(exception.getLocalizedMessage(), exception);
             alertManagement.raiseAnAlert("alert5202", exception.getMessage(), operator, 0);
             auditManagement.updateAudit(501, "FAIL", featureName, moduleName, 0, "",
                     executionFinalTime, 0, 0, "The process exited with exception" + exception.getMessage() + " for operator" + operator + ".", connection.getConnection());
@@ -184,11 +178,11 @@ public class HlrDumpProcessorMain {
 
                 if ((imsi == null || imsi.isEmpty()) && (msisdn != null && !msisdn.isEmpty())) {
                     logger.info("IMSI is null or empty, retrieving IMSI for MSISDN: {}", msisdn);
-                    imsi = getImsiFromMsisdn(msisdn);
+                    imsi = getImsiFromMsisdn(msisdn,conn);
                     logger.info("Retrieved IMSI: {}", imsi);
                 } else if ((msisdn == null || msisdn.isEmpty()) && (imsi != null && !imsi.isEmpty())) {
                     logger.info("MSISDN is null or empty, retrieving MSISDN for IMSI: {}", imsi);
-                    msisdn = getMsisdnFromImsi(imsi);
+                    msisdn = getMsisdnFromImsi(imsi,conn);
                     logger.info("Retrieved MSISDN: {}", msisdn);
                 }
 
@@ -209,12 +203,11 @@ public class HlrDumpProcessorMain {
         logger.info("Finished processing table: {}", tableName);
     }
 
-    public String getMsisdnFromImsi(String imsi) {
+    public String getMsisdnFromImsi(String imsi ,Connection conn) {
         logger.info("Retrieving MSISDN for IMSI: {}", imsi);
         String msisdn = null;
         String query = "SELECT msisdn FROM app.active_msisdn_list WHERE imsi = ?";
-        try (Connection conn = connection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, imsi);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -230,12 +223,11 @@ public class HlrDumpProcessorMain {
         return msisdn;
     }
 
-    public String getImsiFromMsisdn(String msisdn) {
+    public String getImsiFromMsisdn(String msisdn,Connection conn) {
         logger.info("Retrieving IMSI for MSISDN: {}", msisdn);
         String imsi = null;
         String query = "SELECT imsi FROM app.active_msisdn_list WHERE msisdn = ?";
-        try (Connection conn = connection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (  PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, msisdn);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
